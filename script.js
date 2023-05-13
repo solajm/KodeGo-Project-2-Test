@@ -1,138 +1,105 @@
-document.addEventListener("DOMContentLoaded", function() {
-  const canvas = document.getElementById("canvas");
-  const context = canvas.getContext("2d");
-
-  // Set canvas size
-  function setCanvasSize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-
-  setCanvasSize();
-
-  // Sun properties
-  const sun = {
-    x: canvas.width / 2,
-    y: canvas.height / 2,
-    radius: 40,
-    color: "#FFD700"
-  };
-
-  // Planet properties
+document.addEventListener("DOMContentLoaded", function () {
+  const spirographContainer = document.getElementById("spirograph-container");
   const planets = [
-    { name: "Mercury", radius: 10, orbitRadius: 0.2 * canvas.width, orbitSpeed: 0.001, color: "#BEBEBE" },
-    { name: "Venus", radius: 20, orbitRadius: 0.3 * canvas.width, orbitSpeed: 0.0008, color: "#FFA500" },
-    { name: "Earth", radius: 25, orbitRadius: 0.4 * canvas.width, orbitSpeed: 0.0005, color: "#6495ED" },
-    { name: "Mars", radius: 18, orbitRadius: 0.5 * canvas.width, orbitSpeed: 0.0004, color: "#FF4500" },
-    { name: "Jupiter", radius: 50, orbitRadius: 0.7 * canvas.width, orbitSpeed: 0.0002, color: "#CD853F" },
-    { name: "Saturn", radius: 45, orbitRadius: 0.9 * canvas.width, orbitSpeed: 0.0001, color: "#D2B48C" },
-    { name: "Uranus", radius: 35, orbitRadius: 1.1 * canvas.width, orbitSpeed: 0.00008, color: "#00BFFF" },
-    { name: "Neptune", radius: 30, orbitRadius: 1.3 * canvas.width, orbitSpeed: 0.00005, color: "#00008B" },
+    { name: "Mercury", color: "gray", radius: 5, orbitRadius: 50, speed: 0.005 },
+    { name: "Venus", color: "orange", radius: 10, orbitRadius: 80, speed: 0.003 },
+    { name: "Earth", color: "blue", radius: 12, orbitRadius: 120, speed: 0.002 },
+    { name: "Mars", color: "red", radius: 8, orbitRadius: 160, speed: 0.0015 },
+    { name: "Jupiter", color: "brown", radius: 25, orbitRadius: 220, speed: 0.001 },
+    { name: "Saturn", color: "tan", radius: 22, orbitRadius: 280, speed: 0.0008 },
+    { name: "Uranus", color: "lightblue", radius: 18, orbitRadius: 340, speed: 0.0006 },
+    { name: "Neptune", color: "darkblue", radius: 16, orbitRadius: 400, speed: 0.0005 },
   ];
 
-  let zoomLevel = 1; // Initial zoom level
-  let isDragging = false;
-  let lastX = 0;
-  let lastY = 0;
+  let angle = 0;
+  let zoomLevel = 1;
 
-  // Animation loop
   function animate() {
+    // Clear the container
+    spirographContainer.innerHTML = "";
+
+    // Calculate the container size
+    const containerWidth = spirographContainer.offsetWidth;
+    const containerHeight = spirographContainer.offsetHeight;
+
+    // Draw circle outlines for planet orbits
+    planets.forEach(function (planet) {
+      const orbitRadius = planet.orbitRadius * zoomLevel;
+      const planetRadius = planet.radius * zoomLevel;
+      const orbitX = containerWidth / 2 - orbitRadius;
+      const orbitY = containerHeight / 2 - orbitRadius;
+    
+      const orbitElement = document.createElement("div");
+      orbitElement.className = "orbit";
+      orbitElement.style.width = orbitRadius * 2 + "px";
+      orbitElement.style.height = orbitRadius * 2 + "px";
+      orbitElement.style.top = orbitY + "px";
+      orbitElement.style.left = orbitX + "px";
+    
+      spirographContainer.appendChild(orbitElement);
+    
+      const planetX = orbitX + orbitRadius + Math.cos(angle) * orbitRadius - planetRadius;
+      const planetY = orbitY + orbitRadius + Math.sin(angle) * orbitRadius - planetRadius;
+    
+      const planetElement = document.createElement("div");
+      planetElement.className = "planet";
+      planetElement.style.backgroundColor = planet.color;
+      planetElement.style.width = planetRadius * 2 + "px";
+      planetElement.style.height = planetRadius * 2 + "px";
+      planetElement.style.top = planetY + "px";
+      planetElement.style.left = planetX + "px";
+    
+      const planetName = document.createElement("div");
+      planetName.className = "planet-name";
+      planetName.textContent = planet.name;
+    
+      planetElement.appendChild(planetName);
+      spirographContainer.appendChild(planetElement);
+    
+      angle += planet.speed;
+    });
+
     requestAnimationFrame(animate);
-
-    // Clear canvas
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Apply zoom transformation
-    context.save();
-    context.translate(canvas.width / 2, canvas.height / 2);
-    context.scale(zoomLevel, zoomLevel);
-    context.translate(-canvas.width / 2, -canvas.height / 2);
-
-    // Draw background circle for each planet
-    planets.forEach(function(planet) {
-      context.beginPath();
-      context.arc(sun.x, sun.y, planet.orbitRadius, 0, Math.PI * 2, false);
-      context.strokeStyle = "#888888";
-      context.lineWidth = 1 / zoomLevel;
-      context.stroke();
-      context.closePath();
-    });
-
-    // Draw sun
-    context.beginPath();
-    context.arc(sun.x, sun.y, sun.radius, 0, Math.PI * 2, false);
-    context.fillStyle = sun.color;
-    context.fill();
-    context.closePath();
-
-    // Draw planets
-    planets.forEach(function(planet) {
-      const angle = Date.now() * planet.orbitSpeed;
-      const planetX = sun.x + Math.cos(angle) * planet.orbitRadius;
-      const planetY = sun.y + Math.sin(angle) * planet.orbitRadius;
-
-      context.beginPath();
-      context.arc(planetX, planetY, planet.radius, 0, Math.PI * 2, false);
-      context.fillStyle = planet.color;
-      context.fill();
-      context.closePath();
-
-      // Draw planet name
-      context.font = "12px Arial";
-      context.fillStyle = "white";
-      context.textAlign = "center";
-      context.fillText(planet.name, planetX, planetY + planet.radius + 15);
-    });
-
-    context.restore(); // Restore canvas transformation
   }
 
   // Zoom in button
   const zoomInButton = document.getElementById("zoom-in-button");
-  zoomInButton.addEventListener("click", function() {
+  zoomInButton.addEventListener("click", function () {
     zoomLevel += 0.1; // Increase zoom level
   });
 
-  // Zoom out button
-  const zoomOutButton = document.getElementById("zoom-out-button");
-  zoomOutButton.addEventListener("click", function() {
-    zoomLevel -= 0.1; // Decrease zoom level
-    if (zoomLevel < 0.1) {
-      zoomLevel = 0.1; // Set minimum zoom level
-    }
-  });
+  // Drag functionality
+  let isDragging = false;
+  let startPosition = { x: 0, y: 0 };
+  let currentTranslate = { x: 0, y: 0 };
 
-   // Mouse event listeners for dragging
-   canvas.addEventListener("mousedown", function(event) {
+  spirographContainer.addEventListener("mousedown", function (event) {
     isDragging = true;
-    lastX = event.clientX;
-    lastY = event.clientY;
+    startPosition.x = event.clientX;
+    startPosition.y = event.clientY;
   });
 
-  canvas.addEventListener("mousemove", function(event) {
+  spirographContainer.addEventListener("mousemove", function (event) {
     if (isDragging) {
-      const deltaX = event.clientX - lastX;
-      const deltaY = event.clientY - lastY;
-      lastX = event.clientX;
-      lastY = event.clientY;
+      const deltaX = event.clientX - startPosition.x;
+      const deltaY = event.clientY - startPosition.y;
 
-      sun.x += deltaX;
-      sun.y += deltaY;
+      currentTranslate.x += deltaX;
+      currentTranslate.y += deltaY;
+
+      spirographContainer.style.transform = `translate(${currentTranslate.x}px, ${currentTranslate.y}px)`;
+
+      startPosition.x = event.clientX;
+      startPosition.y = event.clientY;
     }
   });
 
-  canvas.addEventListener("mouseup", function() {
+  spirographContainer.addEventListener("mouseup", function () {
     isDragging = false;
   });
 
-  canvas.addEventListener("mouseleave", function() {
+  spirographContainer.addEventListener("mouseleave", function () {
     isDragging = false;
-  });
-
-
-  // Resize event
-  window.addEventListener("resize", function() {
-    setCanvasSize();
   });
 
   // Start animation
