@@ -31,6 +31,9 @@ document.addEventListener("DOMContentLoaded", function() {
   ];
 
   let zoomLevel = 1; // Initial zoom level
+  let isDragging = false;
+  let lastX = 0;
+  let lastY = 0;
 
   // Animation loop
   function animate() {
@@ -82,7 +85,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     context.restore(); // Restore canvas transformation
-
   }
 
   // Zoom in button
@@ -99,6 +101,34 @@ document.addEventListener("DOMContentLoaded", function() {
       zoomLevel = 0.1; // Set minimum zoom level
     }
   });
+
+   // Mouse event listeners for dragging
+   canvas.addEventListener("mousedown", function(event) {
+    isDragging = true;
+    lastX = event.clientX;
+    lastY = event.clientY;
+  });
+
+  canvas.addEventListener("mousemove", function(event) {
+    if (isDragging) {
+      const deltaX = event.clientX - lastX;
+      const deltaY = event.clientY - lastY;
+      lastX = event.clientX;
+      lastY = event.clientY;
+
+      sun.x += deltaX;
+      sun.y += deltaY;
+    }
+  });
+
+  canvas.addEventListener("mouseup", function() {
+    isDragging = false;
+  });
+
+  canvas.addEventListener("mouseleave", function() {
+    isDragging = false;
+  });
+
 
   // Resize event
   window.addEventListener("resize", function() {
