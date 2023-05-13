@@ -22,43 +22,47 @@ document.addEventListener("DOMContentLoaded", function () {
     const containerWidth = spirographContainer.offsetWidth;
     const containerHeight = spirographContainer.offsetHeight;
 
-    // Draw circle outlines for planet orbits
-    planets.forEach(function (planet) {
-      const orbitRadius = planet.orbitRadius * zoomLevel;
-      const planetRadius = planet.radius * zoomLevel;
-      const orbitX = containerWidth / 2 - orbitRadius;
-      const orbitY = containerHeight / 2 - orbitRadius;
-    
-      const orbitElement = document.createElement("div");
-      orbitElement.className = "orbit";
-      orbitElement.style.width = orbitRadius * 2 + "px";
-      orbitElement.style.height = orbitRadius * 2 + "px";
-      orbitElement.style.top = orbitY + "px";
-      orbitElement.style.left = orbitX + "px";
-    
-      spirographContainer.appendChild(orbitElement);
-    
-      const planetX = orbitX + orbitRadius + Math.cos(angle) * orbitRadius - planetRadius;
-      const planetY = orbitY + orbitRadius + Math.sin(angle) * orbitRadius - planetRadius;
-    
-      const planetElement = document.createElement("div");
-      planetElement.className = "planet";
-      planetElement.style.backgroundColor = planet.color;
-      planetElement.style.width = planetRadius * 2 + "px";
-      planetElement.style.height = planetRadius * 2 + "px";
-      planetElement.style.top = planetY + "px";
-      planetElement.style.left = planetX + "px";
-    
-      const planetName = document.createElement("div");
-      planetName.className = "planet-name";
-      planetName.textContent = planet.name;
-    
-      planetElement.appendChild(planetName);
-      spirographContainer.appendChild(planetElement);
-    
-      angle += planet.speed;
-    });
+  // Draw circle outlines for planet orbits
+planets.forEach(function (planet) {
+  const orbitRadius = planet.orbitRadius * zoomLevel;
+  const planetRadius = planet.radius * zoomLevel;
 
+  const orbitX = containerWidth / 2 - planetRadius; // Updated calculation
+  const orbitY = containerHeight / 2 - planetRadius; // Updated calculation
+
+  const orbitElement = document.createElement("div");
+  orbitElement.className = "orbit";
+  orbitElement.style.width = orbitRadius * 2 + "px";
+  orbitElement.style.height = orbitRadius * 2 + "px";
+  orbitElement.style.top = orbitY + "px";
+  orbitElement.style.left = orbitX + "px";
+
+  spirographContainer.appendChild(orbitElement);
+
+  const planetX = orbitX + orbitRadius + Math.cos(angle) * orbitRadius - planetRadius;
+  const planetY = orbitY + orbitRadius + Math.sin(angle) * orbitRadius - planetRadius;
+
+  const planetElement = document.createElement("div");
+  planetElement.className = "planet";
+  planetElement.style.backgroundColor = planet.color;
+  planetElement.style.width = planetRadius * 2 + "px";
+  planetElement.style.height = planetRadius * 2 + "px";
+  planetElement.style.top = planetY + "px";
+  planetElement.style.left = planetX + "px";
+
+  const planetName = document.createElement("div");
+  planetName.className = "planet-name";
+  planetName.textContent = planet.name;
+
+  planetElement.appendChild(planetName);
+  spirographContainer.appendChild(planetElement);
+
+  angle += planet.speed;
+});
+// Add the Sun at the center
+const sunElement = document.createElement("div");
+sunElement.className = "sun";
+spirographContainer.appendChild(sunElement);
     requestAnimationFrame(animate);
   }
 
@@ -68,39 +72,53 @@ document.addEventListener("DOMContentLoaded", function () {
     zoomLevel += 0.1; // Increase zoom level
   });
 
-  // Drag functionality
-  let isDragging = false;
-  let startPosition = { x: 0, y: 0 };
-  let currentTranslate = { x: 0, y: 0 };
+    // Zoom out button
+    const zoomOutButton = document.getElementById("zoom-out-button");
+    zoomOutButton.addEventListener("click", function () {
+      zoomLevel -= 0.1; // Decrease zoom level
+      if (zoomLevel < 0.1) {
+        zoomLevel = 0.1; // Set minimum zoom level
+      }
+    });
+    
+ // Drag functionality
+let isDragging = false;
+let startPosition = { x: 0, y: 0 };
+let currentTranslate = { x: 0, y: 0 };
 
-  spirographContainer.addEventListener("mousedown", function (event) {
-    isDragging = true;
-    startPosition.x = event.clientX;
-    startPosition.y = event.clientY;
-  });
+spirographContainer.addEventListener("mousedown", function (event) {
+  isDragging = true;
+  startPosition.x = event.clientX - currentTranslate.x;
+  startPosition.y = event.clientY - currentTranslate.y;
+});
 
-  spirographContainer.addEventListener("mousemove", function (event) {
-    if (isDragging) {
-      const deltaX = event.clientX - startPosition.x;
-      const deltaY = event.clientY - startPosition.y;
+spirographContainer.addEventListener("mousemove", function (event) {
+  if (isDragging) {
+    const deltaX = event.clientX - startPosition.x;
+    const deltaY = event.clientY - startPosition.y;
 
-      currentTranslate.x += deltaX;
-      currentTranslate.y += deltaY;
+    const containerRect = spirographContainer.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
 
-      spirographContainer.style.transform = `translate(${currentTranslate.x}px, ${currentTranslate.y}px)`;
+    const maxTranslateX = (containerWidth * zoomLevel - containerWidth) / 2;
+    const maxTranslateY = (containerHeight * zoomLevel - containerHeight) / 2;
 
-      startPosition.x = event.clientX;
-      startPosition.y = event.clientY;
-    }
-  });
+    currentTranslate.x = clamp(deltaX, -maxTranslateX, maxTranslateX);
+    currentTranslate.y = clamp(deltaY, -maxTranslateY, maxTranslateY);
 
-  spirographContainer.addEventListener("mouseup", function () {
-    isDragging = false;
-  });
+    spirographContainer.style.transform = `translate(${currentTranslate.x}px, ${currentTranslate.y}px)`;
+  }
+});
 
-  spirographContainer.addEventListener("mouseleave", function () {
-    isDragging = false;
-  });
+spirographContainer.addEventListener("mouseup", function () {
+  isDragging = false;
+});
+
+spirographContainer.addEventListener("mouseleave", function () {
+  isDragging = false;
+});
+
 
   // Start animation
   animate();
