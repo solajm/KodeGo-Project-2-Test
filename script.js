@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+
   function animate() {
     // Clear the container
     spirographContainer.innerHTML = "";
@@ -42,6 +43,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const sunElement = document.createElement("div");
     sunElement.className = "sun";
     spirographContainer.appendChild(sunElement);
+
+    
 
     // Draw planets
 planets.forEach(function (planet, index) {
@@ -73,7 +76,9 @@ planets.forEach(function (planet, index) {
 
   planetElement.appendChild(planetName);
   spirographContainer.appendChild(planetElement);
+
 });
+
 
     angle += 0.01; // Increase the angle for smoother animation
 
