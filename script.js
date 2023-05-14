@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Zoom in button
   const zoomInButton = document.getElementById("zoom-in-button");
   zoomInButton.addEventListener("click", function () {
-    zoomLevel += 0.1; // Increase zoom level
+    zoomLevel += 0.2; // Increase zoom level
   });
 
   // Zoom out button
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
   zoomOutButton.addEventListener("click", function () {
     zoomLevel -= 0.1; // Decrease zoom level
     if (zoomLevel < 0.1) {
-      zoomLevel = 0.1; // Set minimum zoom level
+      zoomLevel = 0.2; // Set minimum zoom level
     }
   });
 
@@ -80,7 +80,7 @@ planets.forEach(function (planet, index) {
 });
 
 
-    angle += 0.01; // Increase the angle for smoother animation
+    angle += 0.004; // Increase the angle for smoother animation
 
     requestAnimationFrame(animate);
   }
