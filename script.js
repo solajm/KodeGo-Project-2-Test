@@ -44,40 +44,40 @@ document.addEventListener("DOMContentLoaded", function () {
     sunElement.className = "sun";
     spirographContainer.appendChild(sunElement);
 
-    
+
 
     // Draw planets
-planets.forEach(function (planet, index) {
-  const orbitRadius = planet.orbitRadius * zoomLevel;
-  const planetRadius = planet.radius * zoomLevel;
+    planets.forEach(function (planet, index) {
+      const orbitRadius = planet.orbitRadius * zoomLevel;
+      const planetRadius = planet.radius * zoomLevel;
 
-  const planetX =
-    containerWidth / 2 +
-    Math.cos(angle * planet.speed) * (orbitRadius + planet.orbitRadius * zoomLevel) -
-    planetRadius;
-  const planetY =
-    containerHeight / 2 +
-    Math.sin(angle * planet.speed) * (orbitRadius + planet.orbitRadius * zoomLevel) -
-    planetRadius;
+      const planetX =
+        containerWidth / 2 +
+        Math.cos(angle * planet.speed) * (orbitRadius + planet.orbitRadius * zoomLevel) -
+        planetRadius;
+      const planetY =
+        containerHeight / 2 +
+        Math.sin(angle * planet.speed) * (orbitRadius + planet.orbitRadius * zoomLevel) -
+        planetRadius;
 
-  const planetElement = document.createElement("div");
-  planetElement.className = "planet";
-  planetElement.style.backgroundColor = planet.color;
-  planetElement.style.width = planetRadius * 2 + "px";
-  planetElement.style.height = planetRadius * 2 + "px";
-  planetElement.style.top = planetY + "px";
-  planetElement.style.left = planetX + "px";
+      const planetElement = document.createElement("div");
+      planetElement.className = "planet";
+      planetElement.style.backgroundColor = planet.color;
+      planetElement.style.width = planetRadius * 2 + "px";
+      planetElement.style.height = planetRadius * 2 + "px";
+      planetElement.style.top = planetY + "px";
+      planetElement.style.left = planetX + "px";
 
-  const planetName = document.createElement("div");
-  planetName.className = "planet-name";
-  planetName.textContent = planet.name;
-  planetName.style.fontSize = planetRadius / 4 + "px"; // Adjust the font size relative to the planet's size
-  planetName.style.top = planetRadius * 2 + "px"; // Position the label below the planet
+      const planetName = document.createElement("div");
+      planetName.className = "planet-name";
+      planetName.textContent = planet.name;
+      planetName.style.fontSize = planetRadius / 4 + "px"; // Adjust the font size relative to the planet's size
+      planetName.style.top = planetRadius * 2 + "px"; // Position the label below the planet
 
-  planetElement.appendChild(planetName);
-  spirographContainer.appendChild(planetElement);
+      planetElement.appendChild(planetName);
+      spirographContainer.appendChild(planetElement);
 
-});
+    });
 
 
     angle += 0.004; // Increase the angle for smoother animation
